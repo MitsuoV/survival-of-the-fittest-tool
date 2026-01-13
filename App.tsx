@@ -17,6 +17,11 @@ const App: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [evaluating, setEvaluating] = useState(false);
 
+  // Custom trait state
+  const [customTraitName, setCustomTraitName] = useState('');
+  const [customTraitDesc, setCustomTraitDesc] = useState('');
+  const [showCustomForm, setShowCustomForm] = useState(false);
+
   const categories = ['All', 'Physical', 'Physiological', 'Behavioral', 'Feeding', 'Reproductive'];
 
   const spinRoulette = () => {
@@ -39,6 +44,24 @@ const App: React.FC = () => {
       if (prev.find(t => t.id === trait.id)) return prev.filter(t => t.id !== trait.id);
       return [...prev, trait];
     });
+  };
+
+  const addCustomTrait = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!customTraitName.trim()) return;
+
+    const newTrait: Trait = {
+      id: Date.now(), // Unique ID
+      name: customTraitName,
+      description: customTraitDesc || 'Specially evolved unique adaptation.',
+      category: 'Physiological', // Default category
+      icon: 'fa-dna'
+    };
+
+    setSelectedTraits(prev => [...prev, newTrait]);
+    setCustomTraitName('');
+    setCustomTraitDesc('');
+    setShowCustomForm(false);
   };
 
   const handleGenerate = async () => {
@@ -82,6 +105,7 @@ const App: React.FC = () => {
     setSpeciesInfo('');
     setViabilityData(null);
     setActiveCategory('All');
+    setShowCustomForm(false);
   };
 
   const filteredTraits = activeCategory === 'All' ? TRAITS : TRAITS.filter(t => t.category === activeCategory);
@@ -185,7 +209,7 @@ const App: React.FC = () => {
             <div className="flex flex-col md:flex-row justify-between items-start gap-6">
               <div className="flex-1">
                 <h2 className="text-4xl font-bold mb-2 tracking-tight">Genetic Blueprint</h2>
-                <p className="text-white/60 mb-6">Select adaptations to configure the specimen for its environment (Min. 5 traits).</p>
+                <p className="text-white/60 mb-6">Select or define adaptations for the specimen (Min. 5 traits).</p>
                 <div className="flex flex-col gap-2 max-w-xs">
                   <label className="text-[10px] font-bold uppercase tracking-widest opacity-50 ml-1">Filter by Biological System</label>
                   <select value={activeCategory} onChange={(e) => setActiveCategory(e.target.value)} className="bg-neutral-800 border border-white/10 text-white rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-emerald-500 transition-all cursor-pointer appearance-none shadow-xl">
@@ -210,6 +234,53 @@ const App: React.FC = () => {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+              {/* Custom Trait Card */}
+              <div className={`p-5 rounded-2xl glass-panel border border-dashed transition-all duration-300 ${showCustomForm ? 'ring-2 ring-emerald-500 border-emerald-500/50' : 'border-white/10 hover:border-emerald-500/30'}`}>
+                {!showCustomForm ? (
+                  <button 
+                    onClick={() => setShowCustomForm(true)}
+                    className="w-full h-full flex flex-col items-center justify-center gap-3 py-4"
+                  >
+                    <div className="w-12 h-12 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-400">
+                      <i className="fa-solid fa-plus text-xl"></i>
+                    </div>
+                    <span className="text-xs font-bold uppercase tracking-widest text-emerald-400">Define Custom Trait</span>
+                  </button>
+                ) : (
+                  <form onSubmit={addCustomTrait} className="flex flex-col gap-3">
+                    <input 
+                      autoFocus
+                      type="text" 
+                      placeholder="Trait Name..." 
+                      className="bg-black/50 border border-white/10 rounded-lg p-2 text-sm outline-none focus:border-emerald-500"
+                      value={customTraitName}
+                      onChange={e => setCustomTraitName(e.target.value)}
+                    />
+                    <textarea 
+                      placeholder="Description..." 
+                      className="bg-black/50 border border-white/10 rounded-lg p-2 text-[10px] outline-none focus:border-emerald-500 resize-none h-16"
+                      value={customTraitDesc}
+                      onChange={e => setCustomTraitDesc(e.target.value)}
+                    />
+                    <div className="flex gap-2">
+                      <button 
+                        type="button"
+                        onClick={() => setShowCustomForm(false)}
+                        className="flex-1 py-1 text-[10px] font-bold uppercase tracking-widest bg-white/5 rounded border border-white/10"
+                      >
+                        Cancel
+                      </button>
+                      <button 
+                        type="submit"
+                        className="flex-1 py-1 text-[10px] font-bold uppercase tracking-widest bg-emerald-500 text-black rounded"
+                      >
+                        Add
+                      </button>
+                    </div>
+                  </form>
+                )}
+              </div>
+
               {filteredTraits.map(trait => {
                 const isSelected = selectedTraits.some(t => t.id === trait.id);
                 return (
@@ -297,7 +368,6 @@ const App: React.FC = () => {
                     <h2 className="text-4xl font-bold uppercase tracking-tighter">Simulation Report</h2>
                   </div>
                   
-                  {/* Environment Detail Bar below Report Title */}
                   <div className="glass-panel p-4 rounded-2xl border border-white/10 inline-flex flex-col md:flex-row gap-4 md:gap-12 items-center text-left">
                     <div className="flex flex-col">
                       <span className="text-[9px] font-bold uppercase tracking-widest opacity-40">Environment</span>
