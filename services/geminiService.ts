@@ -37,14 +37,13 @@ export const generateSpeciesImage = async (env: Environment, traits: Trait[]) =>
   const apiKey = process.env.API_KEY;
   if (!apiKey) return null;
 
-  // Re-initialize to ensure we use the most recent key (especially after a user selection)
   const ai = new GoogleGenAI({ apiKey });
   const traitDetails = traits.map(t => t.name).join(', ');
   
-  const imagePrompt = `A ultra-high-definition, 4K museum-quality scientific biological plate of a newly discovered species.
+  const imagePrompt = `A ultra-high-definition, museum-quality scientific biological plate of a newly discovered species.
   ANATOMICAL FEATURES: ${traitDetails}.
   NATIVE HABITAT: The ${env.name} ecosystem (${env.climate}).
-  ARTISTIC STYLE: Photorealistic scientific illustration, focused on anatomical precision, cinematic natural lighting. 8k resolution textures for skin/fur/scales. Professional biology field guide aesthetic. NO TEXT, watermark, or labels in the image.`;
+  ARTISTIC STYLE: Photorealistic scientific illustration, focused on anatomical precision, cinematic natural lighting. 8k resolution textures for skin/fur/scales. Professional biology field guide aesthetic. No text, watermark, or labels in the image.`;
 
   try {
     const response = await ai.models.generateContent({
@@ -55,15 +54,14 @@ export const generateSpeciesImage = async (env: Environment, traits: Trait[]) =>
       config: {
         imageConfig: {
           aspectRatio: "1:1",
-          imageSize: "1K" // Defaulting to 1K for speed, can be 2K/4K for higher quality
+          imageSize: "1K"
         }
       }
     });
 
-    // Mandatory: Iterate through parts to find the image part (inlineData)
-    const candidates = response.candidates;
-    if (candidates && candidates.length > 0) {
-      const parts = candidates[0].content.parts;
+    // Fix: Properly iterate candidates and parts to extract the inlineData base64 string
+    if (response.candidates && response.candidates.length > 0) {
+      const parts = response.candidates[0].content.parts;
       for (const part of parts) {
         if (part.inlineData) {
           const base64Data = part.inlineData.data;
@@ -73,11 +71,9 @@ export const generateSpeciesImage = async (env: Environment, traits: Trait[]) =>
       }
     }
     
-    console.warn("No image part found in the Pro model response.");
     return null;
   } catch (error: any) {
     console.error("Pro Image Generation Error:", error);
-    // If the error suggests key issues, we signal the UI to trigger the selection dialog
     if (error?.message?.includes("Requested entity was not found") || error?.status === 404) {
       throw new Error("KEY_REQUIRED");
     }
@@ -91,7 +87,7 @@ export const analyzeEvolutionaryViability = async (env: Environment, traits: Tra
 
   const ai = new GoogleGenAI({ apiKey });
   const traitNames = traits.map(t => t.name).join(', ');
-  const prompt = `Perform a high-fidelity survival simulation for a species in ${env.name} with traits: [${traitNames}]. Return JSON.`;
+  const prompt = `Perform a high-fidelity survival simulation for a species in ${env.name} with traits: [${traitNames}]. Return JSON format.`;
 
   try {
     const response = await ai.models.generateContent({
