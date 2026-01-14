@@ -62,16 +62,18 @@ export const generateSpeciesImage = async (env: Environment, traits: Trait[]) =>
       }
     });
 
-    // Robust part extraction as per guidelines
-    if (response.candidates && response.candidates[0].content.parts) {
-      for (const part of response.candidates[0].content.parts) {
+    // The response.candidates[0].content.parts is the standard way to access parts
+    const parts = response.candidates?.[0]?.content?.parts;
+    if (parts) {
+      for (const part of parts) {
         if (part.inlineData) {
-          return `data:image/png;base64,${part.inlineData.data}`;
+          const base64EncodeString = part.inlineData.data;
+          return `data:image/png;base64,${base64EncodeString}`;
         }
       }
     }
     
-    console.warn("No image data found in the model response parts.");
+    console.warn("No image part found in Gemini response.");
     return null;
   } catch (error) {
     console.error("Gemini Image Generation Error:", error);
