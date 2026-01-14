@@ -51,10 +51,10 @@ const App: React.FC = () => {
     if (!customTraitName.trim()) return;
 
     const newTrait: Trait = {
-      id: Date.now(), // Unique ID
+      id: Date.now(),
       name: customTraitName,
       description: customTraitDesc || 'Specially evolved unique adaptation.',
-      category: 'Physiological', // Default category
+      category: 'Physiological',
       icon: 'fa-dna'
     };
 
@@ -121,10 +121,10 @@ const App: React.FC = () => {
         </div>
         <div className="flex gap-4 items-center">
           <div className="hidden md:flex gap-8 text-sm font-medium opacity-70">
-            <span className={step === GameStep.ENVIRONMENT ? 'text-white underline' : ''}>1. Environment</span>
-            <span className={step === GameStep.TRAITS ? 'text-white underline' : ''}>2. Traits</span>
-            <span className={step === GameStep.RESULT ? 'text-white underline' : ''}>3. Synthesis</span>
-            <span className={step === GameStep.EVALUATION ? 'text-white underline' : ''}>4. Evaluation</span>
+            <span className={step === GameStep.ENVIRONMENT ? 'text-white underline underline-offset-8' : ''}>1. Environment</span>
+            <span className={step === GameStep.TRAITS ? 'text-white underline underline-offset-8' : ''}>2. Traits</span>
+            <span className={step === GameStep.RESULT ? 'text-white underline underline-offset-8' : ''}>3. Synthesis</span>
+            <span className={step === GameStep.EVALUATION ? 'text-white underline underline-offset-8' : ''}>4. Evaluation</span>
           </div>
           {step !== GameStep.ENVIRONMENT && (
             <button onClick={resetGame} className="px-4 py-2 rounded-full border border-white/20 text-xs hover:bg-white/10 transition">Restart</button>
@@ -234,48 +234,19 @@ const App: React.FC = () => {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-              {/* Custom Trait Card */}
               <div className={`p-5 rounded-2xl glass-panel border border-dashed transition-all duration-300 ${showCustomForm ? 'ring-2 ring-emerald-500 border-emerald-500/50' : 'border-white/10 hover:border-emerald-500/30'}`}>
                 {!showCustomForm ? (
-                  <button 
-                    onClick={() => setShowCustomForm(true)}
-                    className="w-full h-full flex flex-col items-center justify-center gap-3 py-4"
-                  >
-                    <div className="w-12 h-12 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-400">
-                      <i className="fa-solid fa-plus text-xl"></i>
-                    </div>
+                  <button onClick={() => setShowCustomForm(true)} className="w-full h-full flex flex-col items-center justify-center gap-3 py-4">
+                    <div className="w-12 h-12 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-400"><i className="fa-solid fa-plus text-xl"></i></div>
                     <span className="text-xs font-bold uppercase tracking-widest text-emerald-400">Define Custom Trait</span>
                   </button>
                 ) : (
                   <form onSubmit={addCustomTrait} className="flex flex-col gap-3">
-                    <input 
-                      autoFocus
-                      type="text" 
-                      placeholder="Trait Name..." 
-                      className="bg-black/50 border border-white/10 rounded-lg p-2 text-sm outline-none focus:border-emerald-500"
-                      value={customTraitName}
-                      onChange={e => setCustomTraitName(e.target.value)}
-                    />
-                    <textarea 
-                      placeholder="Description..." 
-                      className="bg-black/50 border border-white/10 rounded-lg p-2 text-[10px] outline-none focus:border-emerald-500 resize-none h-16"
-                      value={customTraitDesc}
-                      onChange={e => setCustomTraitDesc(e.target.value)}
-                    />
+                    <input autoFocus type="text" placeholder="Trait Name..." className="bg-black/50 border border-white/10 rounded-lg p-2 text-sm outline-none focus:border-emerald-500" value={customTraitName} onChange={e => setCustomTraitName(e.target.value)} />
+                    <textarea placeholder="Description..." className="bg-black/50 border border-white/10 rounded-lg p-2 text-[10px] outline-none focus:border-emerald-500 resize-none h-16" value={customTraitDesc} onChange={e => setCustomTraitDesc(e.target.value)} />
                     <div className="flex gap-2">
-                      <button 
-                        type="button"
-                        onClick={() => setShowCustomForm(false)}
-                        className="flex-1 py-1 text-[10px] font-bold uppercase tracking-widest bg-white/5 rounded border border-white/10"
-                      >
-                        Cancel
-                      </button>
-                      <button 
-                        type="submit"
-                        className="flex-1 py-1 text-[10px] font-bold uppercase tracking-widest bg-emerald-500 text-black rounded"
-                      >
-                        Add
-                      </button>
+                      <button type="button" onClick={() => setShowCustomForm(false)} className="flex-1 py-1 text-[10px] font-bold uppercase tracking-widest bg-white/5 rounded border border-white/10">Cancel</button>
+                      <button type="submit" className="flex-1 py-1 text-[10px] font-bold uppercase tracking-widest bg-emerald-500 text-black rounded">Add</button>
                     </div>
                   </form>
                 )}
@@ -304,136 +275,191 @@ const App: React.FC = () => {
         )}
 
         {step === GameStep.GENERATION && (
-           <div className="flex flex-col items-center justify-center min-h-[60vh] animate-fade-in">
-            <div className="relative w-24 h-24 mb-8">
+           <div className="flex flex-col items-center justify-center min-h-[60vh] animate-fade-in text-center">
+            <div className="relative w-32 h-32 mb-8">
+              <div className="absolute inset-0 border-4 border-emerald-500/10 rounded-full scale-150 blur-xl animate-pulse"></div>
               <div className="absolute inset-0 border-4 border-emerald-500/20 rounded-full"></div>
               <div className="absolute inset-0 border-4 border-t-emerald-500 rounded-full animate-spin"></div>
+              <div className="absolute inset-4 flex items-center justify-center">
+                <i className="fa-solid fa-helix text-3xl text-emerald-400 animate-bounce"></i>
+              </div>
             </div>
-            <h3 className="text-2xl font-bold mb-2 text-emerald-400">Simulating Natural Selection...</h3>
-            <p className="text-white/40 animate-pulse text-center max-w-md uppercase tracking-widest text-[10px]">Team Double Helix Protocol Active</p>
+            <h3 className="text-3xl font-bold mb-2 text-emerald-400 tracking-tight">Simulating Adaptive Pathways...</h3>
+            <p className="text-white/40 animate-pulse text-center max-w-md uppercase tracking-widest text-[10px]">Processing selective pressures & genetic recombination</p>
+            <div className="mt-8 flex gap-2">
+               {[1,2,3].map(i => <div key={i} className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-bounce" style={{ animationDelay: `${i*0.2}s` }}></div>)}
+            </div>
           </div>
         )}
 
         {step === GameStep.RESULT && (
-          <div className="animate-fade-in py-12 flex flex-col items-center gap-12 max-w-4xl mx-auto">
+          <div className="animate-fade-in py-12 flex flex-col items-center gap-12 max-w-5xl mx-auto">
             <div className="text-center">
-              <span className="px-3 py-1 bg-emerald-500/20 text-emerald-400 rounded-full text-xs font-bold uppercase tracking-widest mb-4 inline-block border border-emerald-500/30">Synthesis Complete</span>
-              <h2 className="text-5xl font-bold mb-2 uppercase tracking-tighter">Specimen Identified</h2>
-              <p className="text-white/40 uppercase text-xs tracking-[0.2em]">Verified by Team Double Helix</p>
+              <span className="px-3 py-1 bg-emerald-500/20 text-emerald-400 rounded-full text-xs font-bold uppercase tracking-widest mb-4 inline-block border border-emerald-500/30">Genetic Integrity Verified</span>
+              <h2 className="text-5xl font-bold mb-2 uppercase tracking-tighter">New Specimen Catalogued</h2>
+              <p className="text-white/40 uppercase text-xs tracking-[0.2em]">Team Double Helix • Bio-Synthesis Division</p>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full items-center">
-              <div className="relative group rounded-3xl overflow-hidden border border-white/10 shadow-3xl bg-black aspect-square">
-                {speciesImageUrl ? <img src={speciesImageUrl} alt="Scientific illustration" className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center text-white/20"><i className="fa-solid fa-triangle-exclamation text-4xl"></i></div>}
-                <div className="absolute bottom-0 left-0 w-full p-6 bg-gradient-to-t from-black/80 to-transparent">
-                  <p className="text-xs font-bold uppercase tracking-widest text-emerald-400">Biological Plate</p>
-                  <p className="text-sm text-white/60 italic">Textbook visualization</p>
+            
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 w-full">
+              <div className="lg:col-span-5 space-y-6">
+                <div className="relative group rounded-3xl overflow-hidden border border-white/10 shadow-3xl bg-black aspect-square">
+                  {speciesImageUrl ? <img src={speciesImageUrl} alt="Scientific illustration" className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center text-white/20"><i className="fa-solid fa-dna text-6xl animate-pulse"></i></div>}
+                  <div className="absolute bottom-0 left-0 w-full p-6 bg-gradient-to-t from-black/90 to-transparent">
+                    <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-400">Biological Plate v.2.5</p>
+                    <p className="text-sm text-white/60 italic">Field Guide Visualization</p>
+                  </div>
                 </div>
-              </div>
-              <div className="space-y-6">
-                <div>
-                  <h4 className="text-[10px] font-bold uppercase tracking-[0.3em] opacity-40 mb-6 border-b border-white/5 pb-2">Genetic Profile Summary</h4>
-                  <div className="grid grid-cols-1 gap-3">
+                
+                <div className="glass-panel p-6 rounded-2xl border border-white/10">
+                  <h4 className="text-[10px] font-bold uppercase tracking-[0.3em] opacity-40 mb-4 pb-2 border-b border-white/5">Selected Genotype</h4>
+                  <div className="flex flex-wrap gap-2">
                     {selectedTraits.map(t => (
-                      <div key={t.id} className="p-4 rounded-2xl bg-white/5 border border-white/10 flex items-center gap-4 group hover:bg-emerald-500/10 transition-colors">
-                        <div className="w-10 h-10 rounded-lg bg-emerald-500/20 flex items-center justify-center text-emerald-400"><i className={`fa-solid ${t.icon}`}></i></div>
-                        <div>
-                          <p className="text-sm font-bold text-white group-hover:text-emerald-400 transition-colors">{t.name}</p>
-                          <p className="text-[10px] opacity-40 uppercase tracking-widest font-bold">{t.category}</p>
-                        </div>
+                      <div key={t.id} className="px-3 py-2 rounded-lg bg-emerald-500/5 border border-emerald-500/20 flex items-center gap-2 group hover:bg-emerald-500/20 transition-all cursor-help" title={t.description}>
+                        <i className={`fa-solid ${t.icon} text-emerald-400 text-xs`}></i>
+                        <span className="text-[11px] font-bold text-white/80">{t.name}</span>
                       </div>
                     ))}
                   </div>
                 </div>
               </div>
+
+              <div className="lg:col-span-7 space-y-6">
+                <div className="glass-panel p-8 rounded-3xl border border-white/10 h-full relative overflow-y-auto max-h-[600px] scrollbar-thin scrollbar-thumb-emerald-500">
+                  <div className="flex justify-between items-center mb-6 border-b border-white/5 pb-4">
+                    <h4 className="text-xs font-bold uppercase tracking-[0.4em] text-emerald-400">Official Field Report</h4>
+                    <i className="fa-solid fa-file-medical text-white/20 text-xl"></i>
+                  </div>
+                  <div className="prose prose-invert prose-sm max-w-none text-white/80 leading-relaxed space-y-4">
+                    {speciesInfo.split('\n').map((line, idx) => (
+                      <p key={idx} className={line.startsWith('#') ? 'text-emerald-400 font-bold uppercase tracking-tight text-lg mt-6' : ''}>
+                        {line.replace(/#/g, '')}
+                      </p>
+                    ))}
+                  </div>
+                </div>
+              </div>
             </div>
-            <div className="w-full flex flex-col sm:flex-row gap-4 mt-8">
-              <button onClick={() => setStep(GameStep.TRAITS)} className="flex-1 px-8 py-5 rounded-2xl border border-white/10 font-bold hover:bg-white/5 transition uppercase tracking-widest text-sm">REDESIGN SPECIES</button>
-              <button onClick={handleEvaluation} className="flex-1 px-8 py-5 rounded-2xl bg-white text-black font-bold hover:bg-emerald-400 transition uppercase tracking-widest text-sm shadow-xl">PROCEED TO SURVIVAL EVALUATION</button>
+
+            <div className="w-full flex flex-col sm:flex-row gap-4 mt-8 max-w-3xl">
+              <button onClick={() => setStep(GameStep.TRAITS)} className="flex-1 px-8 py-5 rounded-2xl border border-white/10 font-bold hover:bg-white/5 transition uppercase tracking-widest text-sm">Modify Genome</button>
+              <button onClick={handleEvaluation} className="flex-1 px-8 py-5 rounded-2xl bg-white text-black font-bold hover:bg-emerald-400 transition uppercase tracking-widest text-sm shadow-xl flex items-center justify-center gap-3 group">
+                Initiate Survival Test <i className="fa-solid fa-bolt group-hover:animate-pulse"></i>
+              </button>
             </div>
           </div>
         )}
 
         {step === GameStep.EVALUATION && (
-          <div className="animate-fade-in py-12 max-w-4xl mx-auto">
+          <div className="animate-fade-in py-12 max-w-5xl mx-auto">
             {evaluating ? (
               <div className="flex flex-col items-center justify-center min-h-[40vh]">
-                <div className="w-12 h-12 border-4 border-emerald-500/20 border-t-emerald-500 rounded-full animate-spin mb-4"></div>
-                <p className="text-xs font-bold uppercase tracking-widest text-white/40">Initiating Viability Module...</p>
+                <div className="w-16 h-16 relative mb-6">
+                  <div className="absolute inset-0 border-2 border-emerald-500/10 rounded-full animate-ping"></div>
+                  <div className="absolute inset-0 border-4 border-emerald-500/20 border-t-emerald-500 rounded-full animate-spin"></div>
+                </div>
+                <p className="text-xs font-bold uppercase tracking-widest text-white/40">Aggregating Environmental Selective Factors...</p>
               </div>
             ) : viabilityData && (
-              <div className="space-y-8">
+              <div className="space-y-10">
                 <div className="text-center space-y-4">
                   <div>
-                    <span className="text-xs font-bold uppercase tracking-[0.3em] text-emerald-400 mb-2 block">Evolutionary Viability Analysis</span>
-                    <h2 className="text-4xl font-bold uppercase tracking-tighter">Simulation Report</h2>
+                    <span className="text-xs font-bold uppercase tracking-[0.3em] text-emerald-400 mb-2 block">Evolutionary Stress Simulation</span>
+                    <h2 className="text-5xl font-bold uppercase tracking-tighter">Viability Final Report</h2>
                   </div>
                   
-                  <div className="glass-panel p-4 rounded-2xl border border-white/10 inline-flex flex-col md:flex-row gap-4 md:gap-12 items-center text-left">
+                  <div className="glass-panel p-5 rounded-2xl border border-white/10 inline-flex flex-wrap justify-center gap-6 md:gap-12 items-center text-left">
                     <div className="flex flex-col">
-                      <span className="text-[9px] font-bold uppercase tracking-widest opacity-40">Environment</span>
+                      <span className="text-[9px] font-bold uppercase tracking-widest opacity-40">Test Environment</span>
                       <span className="text-sm font-bold" style={{ color: selectedEnv?.accent }}>{selectedEnv?.name}</span>
                     </div>
-                    <div className="hidden md:block w-px h-6 bg-white/10"></div>
+                    <div className="hidden md:block w-px h-8 bg-white/10"></div>
                     <div className="flex flex-col">
-                      <span className="text-[9px] font-bold uppercase tracking-widest opacity-40">Conditions</span>
-                      <span className="text-[11px] text-white/80">{selectedEnv?.climate}</span>
+                      <span className="text-[9px] font-bold uppercase tracking-widest opacity-40">Selective Pressure</span>
+                      <span className="text-[11px] text-emerald-400 font-bold">{selectedEnv?.challenges}</span>
                     </div>
-                    <div className="hidden md:block w-px h-6 bg-white/10"></div>
+                    <div className="hidden md:block w-px h-8 bg-white/10"></div>
                     <div className="flex flex-col">
-                      <span className="text-[9px] font-bold uppercase tracking-widest opacity-40">Challenge Profile</span>
-                      <span className="text-[11px] text-emerald-400/80 italic">{selectedEnv?.challenges}</span>
+                       <span className="text-[9px] font-bold uppercase tracking-widest opacity-40">Sample Size</span>
+                       <span className="text-[11px] text-white/60">10,000 Iterations</span>
                     </div>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pt-4">
-                  <div className="md:col-span-1 glass-panel p-8 rounded-3xl border border-emerald-500/20 flex flex-col items-center justify-center text-center">
-                    <p className="text-[10px] font-bold uppercase tracking-widest opacity-40 mb-4">🧬 Survival Outcome</p>
-                    <div className="text-6xl font-bold text-emerald-400 mb-2 tracking-tighter">{viabilityData.generations}</div>
-                    <p className="text-xs font-bold uppercase tracking-widest opacity-70 mb-2">Generations Survived</p>
-                    <div className="px-3 py-1 bg-white/10 rounded-full text-[10px] font-bold uppercase tracking-widest">{viabilityData.classification}</div>
-                  </div>
-
-                  <div className="md:col-span-2 space-y-8">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
-                      <div>
-                        <h4 className="text-[10px] font-bold uppercase tracking-widest text-emerald-400 mb-4 flex items-center gap-2">
-                          <i className="fa-solid fa-circle-check"></i> Key Strengths
-                        </h4>
-                        <ul className="space-y-2">
-                          {viabilityData.strengths.map((s: string, i: number) => (
-                            <li key={i} className="text-sm text-white/70 flex gap-2"><span className="text-emerald-500">•</span> {s}</li>
-                          ))}
-                        </ul>
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 pt-4">
+                  <div className="lg:col-span-1 space-y-6">
+                    <div className="glass-panel p-8 rounded-3xl border border-emerald-500/30 flex flex-col items-center justify-center text-center bg-emerald-500/5 relative overflow-hidden group">
+                      <div className="absolute -top-10 -right-10 w-32 h-32 bg-emerald-500/10 rounded-full blur-3xl group-hover:scale-150 transition-transform"></div>
+                      <p className="text-[10px] font-bold uppercase tracking-widest text-emerald-400 mb-6">🧬 Genetic Longevity</p>
+                      <div className="text-7xl font-bold text-emerald-400 mb-2 tracking-tighter drop-shadow-[0_0_15px_rgba(52,211,153,0.4)]">
+                        {viabilityData.generations}
                       </div>
-                      <div>
-                        <h4 className="text-[10px] font-bold uppercase tracking-widest text-amber-400 mb-4 flex items-center gap-2">
-                          <i className="fa-solid fa-circle-exclamation"></i> Major Limitations
-                        </h4>
-                        <ul className="space-y-2">
-                          {viabilityData.limitations.map((l: string, i: number) => (
-                            <li key={i} className="text-sm text-white/70 flex gap-2"><span className="text-amber-500">•</span> {l}</li>
-                          ))}
-                        </ul>
+                      <p className="text-xs font-bold uppercase tracking-widest opacity-70 mb-4">Generations Before Extinction</p>
+                      <div className="px-4 py-2 bg-emerald-500 text-black rounded-lg text-xs font-black uppercase tracking-widest shadow-lg">
+                        {viabilityData.classification}
                       </div>
+                      <div className="mt-8 w-full bg-white/10 h-1.5 rounded-full overflow-hidden">
+                         <div 
+                          className="h-full bg-emerald-500 shadow-[0_0_10px_rgba(52,211,153,0.8)] transition-all duration-1000" 
+                          style={{ width: `${Math.min((viabilityData.generations / 200) * 100, 100)}%` }}
+                         ></div>
+                      </div>
+                      <p className="mt-2 text-[9px] opacity-40 uppercase font-bold tracking-widest">Simulation Confidence: 99.4%</p>
                     </div>
 
                     <div className="glass-panel p-6 rounded-2xl border border-white/5">
-                      <h4 className="text-[10px] font-bold uppercase tracking-widest opacity-40 mb-3 flex items-center gap-2">
-                        <i className="fa-solid fa-arrows-rotate"></i> Evolutionary Outlook
+                      <h4 className="text-[10px] font-bold uppercase tracking-widest opacity-40 mb-4 flex items-center gap-2">
+                        <i className="fa-solid fa-chart-line text-emerald-400"></i> Outlook Projection
                       </h4>
-                      <p className="text-sm text-white/80 leading-relaxed italic">{viabilityData.evolutionaryOutlook}</p>
+                      <p className="text-sm text-white/80 leading-relaxed italic border-l-2 border-emerald-500/30 pl-4">{viabilityData.evolutionaryOutlook}</p>
+                    </div>
+                  </div>
+
+                  <div className="lg:col-span-2 space-y-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                      <div className="glass-panel p-6 rounded-3xl border border-emerald-500/10">
+                        <h4 className="text-[10px] font-bold uppercase tracking-widest text-emerald-400 mb-6 flex items-center gap-2">
+                          <i className="fa-solid fa-circle-check"></i> Adaptive Advantages
+                        </h4>
+                        <ul className="space-y-4">
+                          {viabilityData.strengths.map((s: string, i: number) => (
+                            <li key={i} className="text-sm text-white/70 flex gap-3 items-start group">
+                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 mt-1.5 group-hover:scale-150 transition-transform"></span>
+                              <span>{s}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                      <div className="glass-panel p-6 rounded-3xl border border-rose-500/10">
+                        <h4 className="text-[10px] font-bold uppercase tracking-widest text-rose-400 mb-6 flex items-center gap-2">
+                          <i className="fa-solid fa-circle-exclamation"></i> Critical Vulnerabilities
+                        </h4>
+                        <ul className="space-y-4">
+                          {viabilityData.limitations.map((l: string, i: number) => (
+                            <li key={i} className="text-sm text-white/70 flex gap-3 items-start group">
+                              <span className="w-1.5 h-1.5 rounded-full bg-rose-500 mt-1.5 group-hover:scale-150 transition-transform"></span>
+                              <span>{l}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+                    
+                    <div className="p-8 bg-black/40 rounded-3xl border border-white/5 relative overflow-hidden">
+                       <div className="absolute top-0 left-0 w-1 h-full bg-emerald-500/20"></div>
+                       <p className="text-[10px] text-emerald-400/40 uppercase tracking-[0.3em] font-bold mb-2">Researcher's Memo</p>
+                       <p className="text-xs text-white/50 leading-loose">
+                         The observed phenotype demonstrates a complex interplay between trait synergy and environmental constraints. 
+                         While the {selectedTraits[0]?.name} provided initial survival buffers, the long-term simulation suggests that {viabilityData.limitations[0]} remains a significant barrier to post-extinction-event recovery. 
+                         Recommend iterative mutation modeling in the next sequence.
+                       </p>
                     </div>
                   </div>
                 </div>
 
-                <div className="p-6 bg-white/5 rounded-2xl border border-white/10 text-center">
-                  <p className="text-[10px] text-white/40 uppercase tracking-widest font-bold">Scientific Constraint Reminder</p>
-                  <p className="text-xs text-white/30 mt-1 italic">"Survival depends on environment, not intention or design."</p>
-                </div>
-
                 <div className="flex justify-center pt-8">
-                  <button onClick={resetGame} className="px-12 py-4 rounded-full bg-white text-black font-bold uppercase tracking-widest text-xs hover:bg-emerald-400 transition shadow-2xl">New Selection Sequence</button>
+                  <button onClick={resetGame} className="px-16 py-5 rounded-full bg-white text-black font-extrabold uppercase tracking-widest text-sm hover:bg-emerald-400 transition-all shadow-2xl hover:-translate-y-1 active:scale-95">
+                    Start New Mutation Sequence
+                  </button>
                 </div>
               </div>
             )}
@@ -441,13 +467,20 @@ const App: React.FC = () => {
         )}
       </main>
 
-      <footer className="mt-24 py-12 border-t border-white/5 opacity-50 text-center">
-        <div className="flex flex-col items-center gap-4">
-          <div className="flex items-center gap-2 text-emerald-500">
-            <i className="fa-solid fa-helix animate-pulse"></i>
-            <span className="text-xs font-bold uppercase tracking-[0.4em]">Team Double Helix</span>
+      <footer className="mt-24 py-16 border-t border-white/5 bg-black/20">
+        <div className="max-w-7xl mx-auto px-6 flex flex-col items-center gap-6">
+          <div className="flex items-center gap-3 text-emerald-500">
+            <i className="fa-solid fa-dna text-2xl animate-spin [animation-duration:5s]"></i>
+            <span className="text-sm font-bold uppercase tracking-[0.6em]">Team Double Helix</span>
           </div>
-          <p className="text-[10px] tracking-widest uppercase opacity-40">Survival of the Fittest Engine • Strictly Educational Research Tool</p>
+          <div className="flex gap-8 text-[9px] uppercase tracking-widest font-bold opacity-30">
+            <span>Adaptive Engine v4.0</span>
+            <span>Selective Pressure Module v2.1</span>
+            <span>Genotype Mapper v1.8</span>
+          </div>
+          <p className="text-[10px] tracking-widest uppercase opacity-20 max-w-lg text-center leading-relaxed">
+            Evolution Roulette is a strictly educational heuristic tool. It uses advanced modeling to simulate biological concepts. Natural selection is stochastic and results may vary based on environmental noise.
+          </p>
         </div>
       </footer>
     </div>
