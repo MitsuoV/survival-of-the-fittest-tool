@@ -4,7 +4,10 @@ import { Environment, Trait } from "../types";
 
 export const generateSpeciesData = async (env: Environment, traits: Trait[]) => {
   const apiKey = process.env.API_KEY;
-  if (!apiKey) return "Configuration error: API Key not found.";
+  if (!apiKey) {
+    console.error("API_KEY is missing from environment variables.");
+    return "Configuration error: API Key not found.";
+  }
   
   const ai = new GoogleGenAI({ apiKey });
   const traitNames = traits.map(t => t.name).join(', ');
@@ -17,7 +20,7 @@ export const generateSpeciesData = async (env: Environment, traits: Trait[]) => 
   TASK:
   1. Create a scientifically plausible fictional species that evolved specifically in this environment using these traits.
   2. Explain the anatomical and physiological synergies.
-  3. Use academic, biological terminology.
+  3. Use academic, biological terminology. Avoid any mention of magic or fantasy.
   
   Provide a detailed field report including a scientific name (Latin-style).`;
 
@@ -29,54 +32,49 @@ export const generateSpeciesData = async (env: Environment, traits: Trait[]) => 
     return response.text;
   } catch (error) {
     console.error("Gemini Text Generation Error:", error);
-    return "Error generating species data.";
+    return "Error generating species data. Please check your API key and connection.";
   }
 };
 
 export const generateSpeciesImage = async (env: Environment, traits: Trait[]) => {
   const apiKey = process.env.API_KEY;
-  if (!apiKey) return null;
+  if (!apiKey) {
+    console.error("API_KEY is missing from environment variables.");
+    return null;
+  }
 
   const ai = new GoogleGenAI({ apiKey });
   const traitDetails = traits.map(t => t.name).join(', ');
-  
-  const imagePrompt = `A ultra-high-definition, museum-quality scientific biological plate of a newly discovered species.
-  ANATOMICAL FEATURES: ${traitDetails}.
-  NATIVE HABITAT: The ${env.name} ecosystem (${env.climate}).
-  ARTISTIC STYLE: Photorealistic scientific illustration, focused on anatomical precision, cinematic natural lighting. 8k resolution textures for skin/fur/scales. Professional biology field guide aesthetic. No text, watermark, or labels in the image.`;
+  const imagePrompt = `A professional biology textbook illustration of a new species discovered in the ${env.name}. 
+  ANATOMY: The specimen exhibits ${traitDetails}. 
+  STYLE: Carbon dust scientific illustration or high-end nature documentary still. 
+  ENVIRONMENT: Showing the specimen in its natural habitat (${env.climate}).
+  CONSTRAINTS: MUST BE biologically plausible. Clean composition, focused on anatomical detail. Background is a realistic ecosystem. Biology field guide aesthetic.`;
 
   try {
     const response = await ai.models.generateContent({
-      model: 'gemini-3-pro-image-preview',
-      contents: {
-        parts: [{ text: imagePrompt }]
-      },
+      model: 'gemini-2.5-flash-image',
+      contents: { parts: [{ text: imagePrompt }] },
       config: {
         imageConfig: {
-          aspectRatio: "1:1",
-          imageSize: "1K"
+          aspectRatio: "1:1"
         }
       }
     });
 
-    // Fix: Properly iterate candidates and parts to extract the inlineData base64 string
-    if (response.candidates && response.candidates.length > 0) {
-      const parts = response.candidates[0].content.parts;
-      for (const part of parts) {
+    // Robust part extraction as per guidelines
+    if (response.candidates && response.candidates[0].content.parts) {
+      for (const part of response.candidates[0].content.parts) {
         if (part.inlineData) {
-          const base64Data = part.inlineData.data;
-          const mimeType = part.inlineData.mimeType || 'image/png';
-          return `data:${mimeType};base64,${base64Data}`;
+          return `data:image/png;base64,${part.inlineData.data}`;
         }
       }
     }
     
+    console.warn("No image data found in the model response parts.");
     return null;
-  } catch (error: any) {
-    console.error("Pro Image Generation Error:", error);
-    if (error?.message?.includes("Requested entity was not found") || error?.status === 404) {
-      throw new Error("KEY_REQUIRED");
-    }
+  } catch (error) {
+    console.error("Gemini Image Generation Error:", error);
     return null;
   }
 };
@@ -87,7 +85,17 @@ export const analyzeEvolutionaryViability = async (env: Environment, traits: Tra
 
   const ai = new GoogleGenAI({ apiKey });
   const traitNames = traits.map(t => t.name).join(', ');
-  const prompt = `Perform a high-fidelity survival simulation for a species in ${env.name} with traits: [${traitNames}]. Return JSON format.`;
+  const prompt = `Analyze survival of a species in ${env.name} with traits: [${traitNames}].
+  
+  Return strictly JSON.
+  Schema:
+  {
+    "generations": number,
+    "classification": string,
+    "strengths": string[],
+    "limitations": string[],
+    "evolutionaryOutlook": string
+  }`;
 
   try {
     const response = await ai.models.generateContent({
