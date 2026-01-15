@@ -2,59 +2,29 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { Environment, Trait } from "../types";
 
-export const generateSpeciesData = async (env: Environment, traits: Trait[]) => {
-  const apiKey = process.env.API_KEY;
-  if (!apiKey) {
-    console.error("API_KEY is missing from environment variables.");
-    return "Configuration error: API Key not found.";
-  }
-  
-  const ai = new GoogleGenAI({ apiKey });
-  const traitNames = traits.map(t => t.name).join(', ');
-  const prompt = `Act as a world-class evolutionary biologist. 
-  
-  ENVIRONMENT: "${env.name}"
-  ENVIRONMENTAL CHALLENGES: ${env.challenges}
-  SELECTED EVOLUTIONARY TRAITS: [${traitNames}]
-  
-  TASK:
-  1. Create a scientifically plausible fictional species that evolved specifically in this environment using these traits.
-  2. Explain the anatomical and physiological synergies.
-  3. Use academic, biological terminology. Avoid any mention of magic or fantasy.
-  
-  Provide a detailed field report including a scientific name (Latin-style).`;
-
-  try {
-    const response = await ai.models.generateContent({
-      model: 'gemini-3-flash-preview',
-      contents: prompt,
-    });
-    return response.text;
-  } catch (error) {
-    console.error("Gemini Text Generation Error:", error);
-    return "Error generating species data. Please check your API key and connection.";
-  }
-};
-
 export const generateSpeciesImage = async (env: Environment, traits: Trait[]) => {
   const apiKey = process.env.API_KEY;
   if (!apiKey) {
-    console.error("API_KEY is missing from environment variables.");
+    console.error("API_KEY is missing.");
     return null;
   }
 
-  const ai = new GoogleGenAI({ apiKey });
+  // Use a fresh instance right before call as per best practices
+  const ai = new GoogleGenAI({ apiKey: apiKey });
   const traitDetails = traits.map(t => t.name).join(', ');
-  const imagePrompt = `A professional biology textbook illustration of a new species discovered in the ${env.name}. 
-  ANATOMY: The specimen exhibits ${traitDetails}. 
-  STYLE: Carbon dust scientific illustration or high-end nature documentary still. 
-  ENVIRONMENT: Showing the specimen in its natural habitat (${env.climate}).
-  CONSTRAINTS: MUST BE biologically plausible. Clean composition, focused on anatomical detail. Background is a realistic ecosystem. Biology field guide aesthetic.`;
+  
+  // High-fidelity prompt for scientific realism
+  const imagePrompt = `Detailed scientific specimen illustration of a biological creature that evolved in a ${env.name} ecosystem. 
+  Climate: ${env.climate}. Temperature: ${env.temperature}.
+  Its unique physiological traits include: ${traitDetails}. 
+  Visual style: Digital scientific field guide, hyper-realistic creature design, high anatomical detail, natural habitat background, 8k resolution.`;
 
   try {
     const response = await ai.models.generateContent({
       model: 'gemini-2.5-flash-image',
-      contents: { parts: [{ text: imagePrompt }] },
+      contents: { 
+        parts: [{ text: imagePrompt }] 
+      },
       config: {
         imageConfig: {
           aspectRatio: "1:1"
@@ -62,19 +32,20 @@ export const generateSpeciesImage = async (env: Environment, traits: Trait[]) =>
       }
     });
 
-    // Robust part extraction as per guidelines
-    if (response.candidates && response.candidates[0].content.parts) {
-      for (const part of response.candidates[0].content.parts) {
-        if (part.inlineData) {
-          return `data:image/png;base64,${part.inlineData.data}`;
+    // Iterate through parts to find the image data
+    const candidates = response.candidates;
+    if (candidates && candidates.length > 0 && candidates[0].content.parts) {
+      for (const part of candidates[0].content.parts) {
+        if (part.inlineData && part.inlineData.data) {
+          return `data:${part.inlineData.mimeType || 'image/png'};base64,${part.inlineData.data}`;
         }
       }
     }
     
-    console.warn("No image data found in the model response parts.");
+    console.warn("No image found in Gemini response parts. Response structure:", response);
     return null;
   } catch (error) {
-    console.error("Gemini Image Generation Error:", error);
+    console.error("Image Synthesis Failed:", error);
     return null;
   }
 };
@@ -83,19 +54,13 @@ export const analyzeEvolutionaryViability = async (env: Environment, traits: Tra
   const apiKey = process.env.API_KEY;
   if (!apiKey) return null;
 
-  const ai = new GoogleGenAI({ apiKey });
+  const ai = new GoogleGenAI({ apiKey: apiKey });
   const traitNames = traits.map(t => t.name).join(', ');
-  const prompt = `Analyze survival of a species in ${env.name} with traits: [${traitNames}].
+  const prompt = `Analyze the survival probability and evolutionary future of a species in a ${env.name} with the following traits: [${traitNames}]. 
+  Environmental constraints: ${env.challenges}, ${env.climate}, ${env.temperature}.
   
-  Return strictly JSON.
-  Schema:
-  {
-    "generations": number,
-    "classification": string,
-    "strengths": string[],
-    "limitations": string[],
-    "evolutionaryOutlook": string
-  }`;
+  Consider the synergy or conflict between these traits.
+  Return strictly JSON.`;
 
   try {
     const response = await ai.models.generateContent({
@@ -106,19 +71,19 @@ export const analyzeEvolutionaryViability = async (env: Environment, traits: Tra
         responseSchema: {
           type: Type.OBJECT,
           properties: {
-            generations: { type: Type.NUMBER },
-            classification: { type: Type.STRING },
-            strengths: { type: Type.ARRAY, items: { type: Type.STRING } },
-            limitations: { type: Type.ARRAY, items: { type: Type.STRING } },
-            evolutionaryOutlook: { type: Type.STRING }
+            generations: { type: Type.NUMBER, description: "Number of generations before extinction or stability." },
+            classification: { type: Type.STRING, description: "One word status: Apex, Endangered, Thriving, or Extinct." },
+            strengths: { type: Type.ARRAY, items: { type: Type.STRING }, description: "Why these traits help." },
+            limitations: { type: Type.ARRAY, items: { type: Type.STRING }, description: "Vulnerabilities." },
+            evolutionaryOutlook: { type: Type.STRING, description: "A detailed 2-sentence forecast." }
           },
           required: ["generations", "classification", "strengths", "limitations", "evolutionaryOutlook"]
         }
       }
     });
-    return JSON.parse(response.text);
+    return JSON.parse(response.text || "{}");
   } catch (error) {
-    console.error("Analysis Error:", error);
+    console.error("Survival Analysis Error:", error);
     return null;
   }
 };

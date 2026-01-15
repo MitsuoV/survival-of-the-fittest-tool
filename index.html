@@ -39,6 +39,21 @@
         .animate-fade-in {
             animation: fadeIn 0.5s ease forwards;
         }
+
+        /* 360 Degree Horizontal Rotation */
+        @keyframes rotateHorizontal {
+            from { transform: rotateY(0deg); }
+            to { transform: rotateY(360deg); }
+        }
+        .logo-3d-container {
+            perspective: 400px;
+            transform-style: preserve-3d;
+        }
+        .logo-rotate {
+            display: inline-block;
+            animation: rotateHorizontal 6s linear infinite;
+            transform-style: preserve-3d;
+        }
     </style>
 <script type="importmap">
 {
